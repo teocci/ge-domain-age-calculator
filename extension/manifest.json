@@ -1,0 +1,41 @@
+{
+  "action": {
+    "default_icon": {
+      "144": "images/icon-144x144.png",
+      "16": "images/icon-16x16.png",
+      "192": "images/icon-192x192.png",
+      "32": "images/icon-32x32.png",
+      "48": "images/icon-48x48.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts",
+    "js": [
+      "script/loader-component.js"
+    ]
+  },
+  "description": "Domain age calculator is a whois tool / extension developed by Teocci for checking any domain age",
+  "icons": {
+    "144": "images/icon-144x144.png",
+    "16": "images/icon-16x16.png",
+    "192": "images/icon-192x192.png",
+    "32": "images/icon-32x32.png",
+    "48": "images/icon-48x48.png"
+  },
+  "manifest_version": 3,
+  "name": "Domain Age Calculator",
+  "permissions": [
+    "activeTab",
+    "declarativeContent",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.whatsmydns.net/"
+  ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "version": "1.00"
+}
