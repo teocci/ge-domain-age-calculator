@@ -1,44 +1,64 @@
 import Loader from './scripts/loader-component.js'
+import * as PSLHelper from './scripts/psl-helper.js'
 
 'use strict'
+
+const port = chrome.runtime.connect({name: 'fetch-channel'})
 
 const $age = document.getElementById('age')
 const $header = document.getElementById('header')
 const $loader = document.getElementById('loader')
 $loader.style.display = 'block'
 
-async function fetchAge(domain) {
+function fetchAge(ev) {
     const loader = new Loader($loader)
-    try {
-        loader.show()
-        const response = await chrome.runtime.sendMessage({
-            type: 'fetch-age',
-            domain,
-        })
-        console.log({response})
 
-        if (!response || response.error || !response?.age) throw new Error('Unable to Fetch Domain Age')
-        $header.textContent = 'Domain age is'
-        $age.textContent = response.age
-    } catch (error) {
-        console.error(error)
-        $header.textContent = 'Unable to Fetch Domain Age'
-        $age.textContent = ''
-    } finally {
-        loader.hide()
+    const type = ev.type
+    switch (type) {
+        case 'fetch-age-initiated':
+            console.log('fetch-age-initiated')
+            loader.show()
+            break
+        case 'on-fetch-age-data':
+            if (!ev || ev.error || !ev?.age) {
+                loader.hide()
+                $header.textContent = 'Unable to Fetch Domain Age'
+                $age.textContent = ''
+                return
+            }
+
+            $header.textContent = 'Domain age is'
+            $age.textContent = ev.age
+            break
+        default:
+            loader.hide()
+            break
     }
-
 }
 
-chrome.tabs.query({
-    active: true,
-    currentWindow: true,
-}, function (tabs) {
+window.onload = () => {
+    console.log('init')
 
-    let domain = new URL(tabs[0].url)
-    if (domain && domain?.protocol?.includes('http')) {
-        domain = domain.hostname
-        fetchAge(domain).then()
-    }
-})
+    port.onMessage.addListener(ev => {
+        console.log('Content[ev][type]', ev.type)
+        fetchAge(ev)
+    })
 
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+    }, function (tabs) {
+        console.log('Tabs:', {tabs, tab: tabs[0], url: tabs[0].url})
+
+        let domain = new URL(tabs[0].url)
+        if (domain && domain?.protocol?.includes('http')) {
+            domain = PSLHelper.get(domain.hostname) ?? domain.hostname
+            console.log('Domain:', domain)
+
+            port.postMessage({
+                type: 'fetch-age',
+                domain,
+            })
+        }
+    })
+}

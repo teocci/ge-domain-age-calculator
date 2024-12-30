@@ -13,7 +13,13 @@
     "extension_pages": "script-src 'self'; object-src 'self'",
     "sandbox": "sandbox allow-scripts",
     "js": [
-      "script/loader-component.js"
+      "script/loader-component.js",
+      "script/popup.js",
+      "script/pls-helper.js",
+      "script/punycode.js"
+    ],
+    "web_accessible_resources": [
+      "scripts/rules.json"
     ]
   },
   "description": "Domain age calculator is a whois tool / extension developed by Teocci for checking any domain age",
@@ -35,7 +41,8 @@
     "https://www.whatsmydns.net/"
   ],
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "version": "1.00"
 }
